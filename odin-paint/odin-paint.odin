@@ -161,7 +161,7 @@ main :: proc() {
 	mouse_x, mouse_y: i32
     prev_mouse_pos: glm.ivec2 = {0, 0}
 	mouse_bits: u32
-    paint_radius: i32 = 20
+    paint_radius: i32 = 8
     paint_color: glm.vec3 = {1, 1, 1}
     painting: bool = false
 
@@ -201,8 +201,9 @@ main :: proc() {
         // Getting values
         prev_mouse_pos = {mouse_x, mouse_y}
         mouse_bits = SDL.GetMouseState(&mouse_x, &mouse_y)
-        if mouse_bits == 1 {
+        if mouse_bits == 1 && painting == false{
             painting = true
+            prev_mouse_pos = {mouse_x, mouse_y}
         }
         else if mouse_bits == 0 && painting {
             painting = false
