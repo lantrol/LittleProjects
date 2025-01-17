@@ -53,9 +53,8 @@ main :: proc() {
 		{{1, -1, 0}, {1, 0}},
 	}
 	screen_elems := []u32{0, 1, 2, 1, 2, 3}
-	texture := [?]u8 {
-		0 ..< WINDOW_WIDTH * WINDOW_HEIGHT * 3 = 0,
-	}
+	texture := make([]u8, WINDOW_WIDTH * WINDOW_HEIGHT * 3)
+	defer delete(texture)
     
     // Program creation
     program, paint_program: u32
