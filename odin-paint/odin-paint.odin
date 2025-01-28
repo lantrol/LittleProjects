@@ -12,8 +12,10 @@ GL_VERSION_MINOR :: 3
 
 main :: proc() {
 	// SDL and OpenGL Startup
-	WINDOW_WIDTH :: 1920
-	WINDOW_HEIGHT :: 1080
+	WINDOW_WIDTH: i32 = 1280
+	WINDOW_HEIGHT: i32 = 720
+    TEXTURE_WIDTH: i32 = 1920
+    TEXTURE_HEIGHT: i32 = 1080
 
 	SDL.Init({.VIDEO})
 	defer SDL.Quit()
@@ -24,7 +26,7 @@ main :: proc() {
 		SDL.WINDOWPOS_UNDEFINED,
 		WINDOW_WIDTH,
 		WINDOW_HEIGHT,
-		{.OPENGL},
+		{.OPENGL, .RESIZABLE},
 	)
 	if window == nil {
 		fmt.eprintln("Error creando ventana")
@@ -54,7 +56,7 @@ main :: proc() {
 		{{1, -1, 0}, {1, 0}},
 	}
 	screen_elems := []u32{0, 1, 2, 1, 2, 3}
-	texture := make([]u8, WINDOW_WIDTH * WINDOW_HEIGHT * 3)
+	texture := make([]u8, TEXTURE_WIDTH * TEXTURE_HEIGHT * 3)
 	defer delete(texture)
 
 	// Program creation
@@ -117,8 +119,8 @@ main :: proc() {
 		gl.TEXTURE_2D,
 		0,
 		gl.RGB,
-		WINDOW_WIDTH,
-		WINDOW_HEIGHT,
+		TEXTURE_WIDTH,
+		TEXTURE_HEIGHT,
 		0,
 		gl.RGB,
 		gl.UNSIGNED_BYTE,
@@ -137,8 +139,8 @@ main :: proc() {
 		gl.TEXTURE_2D,
 		0,
 		gl.RGB,
-		WINDOW_WIDTH,
-		WINDOW_HEIGHT,
+		TEXTURE_WIDTH,
+		TEXTURE_HEIGHT,
 		0,
 		gl.RGB,
 		gl.UNSIGNED_BYTE,
@@ -196,7 +198,7 @@ main :: proc() {
 				case .NUM5:
 					paint_color = {0, 0, 1}
 				case .NUM8:
-					for i := 0; i < WINDOW_WIDTH * WINDOW_HEIGHT * 3; i += 1 {
+					for i: i32 = 0; i < TEXTURE_WIDTH * TEXTURE_HEIGHT * 3; i += 1 {
 						texture[i] = 255
 					}
 					gl.BindTexture(gl.TEXTURE_2D, canvas0)
@@ -204,15 +206,15 @@ main :: proc() {
 						gl.TEXTURE_2D,
 						0,
 						gl.RGB,
-						WINDOW_WIDTH,
-						WINDOW_HEIGHT,
+						TEXTURE_WIDTH,
+						TEXTURE_HEIGHT,
 						0,
 						gl.RGB,
 						gl.UNSIGNED_BYTE,
 						&texture[0],
 					)
 				case .NUM9:
-					for i := 0; i < WINDOW_WIDTH * WINDOW_HEIGHT * 3; i += 1 {
+					for i: i32 = 0; i < TEXTURE_WIDTH * TEXTURE_HEIGHT * 3; i += 1 {
 						texture[i] = 0
 					}
 					gl.BindTexture(gl.TEXTURE_2D, canvas0)
@@ -220,8 +222,8 @@ main :: proc() {
 						gl.TEXTURE_2D,
 						0,
 						gl.RGB,
-						WINDOW_WIDTH,
-						WINDOW_HEIGHT,
+						TEXTURE_WIDTH,
+						TEXTURE_HEIGHT,
 						0,
 						gl.RGB,
 						gl.UNSIGNED_BYTE,
@@ -234,7 +236,12 @@ main :: proc() {
 			case .MOUSEWHEEL:
 				paint_radius += event.wheel.y
 				if paint_radius < 1 do paint_radius = 1
-			}
+            case .WINDOWEVENT:
+                if event.window.event == .RESIZED {
+                    WINDOW_WIDTH = event.window.data1
+                    WINDOW_HEIGHT = event.window.data2
+                }
+            }
 		}
 		// Getting values
 		prev_mouse_pos = {mouse_x, mouse_y}
@@ -246,7 +253,7 @@ main :: proc() {
 			painting = false
 		}
 
-		gl.Viewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT)
+		gl.Viewport(0, 0, TEXTURE_WIDTH, TEXTURE_HEIGHT)
 		gl.ClearColor(0.4, 0.4, 0.4, 1.0)
 		gl.Clear(gl.COLOR_BUFFER_BIT)
 
@@ -368,3 +375,4 @@ void main() {
     }
 }
 `
+
